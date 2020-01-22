@@ -8,8 +8,17 @@
     node_exporter_binary_local_dir: "/tmp/node_exporter-linux-amd64"
     node_exporter_system_group: "root"
     node_exporter_system_user: "root"
-    node_exporter_textfile_dir: ""
     node_exporter_enabled_collectors:
       - entropy
     node_exporter_disabled_collectors:
       - diskstats
+    node_exporter_textfile_collectors:
+      - src: "/tmp/md_info_detail.sh"
+        special_time: "hourly"
+      - src: "/tmp/apt.sh"
+        user: node-exp
+        minute: "*"
+        hour: "*"
+        day: "*"
+        month: "*"
+        weekday: "*"
