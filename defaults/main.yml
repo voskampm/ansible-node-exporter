@@ -7,6 +7,18 @@ node_exporter_system_group: "node-exp"
 node_exporter_system_user: "{{ node_exporter_system_group }}"
 
 node_exporter_textfile_dir: "/var/lib/node_exporter"
+node_exporter_textfile_collectors: []
+# node_exporter_textfile_collectors:
+#   - src: "/tmp/md_info_detail.sh"
+#     user: root
+#     minute: "*"
+#     hour: "12"
+#     day: "*"
+#     month: "*"
+#     weekday: "1,2,6"
+#   - src: "/tmp/apt.sh"
+#     special_time: "hourly"
+
 
 node_exporter_enabled_collectors:
   - systemd

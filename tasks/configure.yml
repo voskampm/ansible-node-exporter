@@ -8,16 +8,6 @@
     mode: 0644
   notify: restart node_exporter
 
-- name: Create textfile collector dir
-  file:
-    path: "{{ node_exporter_textfile_dir }}"
-    state: directory
-    owner: "{{ node_exporter_system_user }}"
-    group: "{{ node_exporter_system_group }}"
-    recurse: true
-    mode: 0775
-  when: node_exporter_textfile_dir | length > 0
-
 - name: Allow Node Exporter port in SELinux on RedHat OS family
   seport:
     ports: "{{ node_exporter_web_listen_address.split(':')[-1] }}"
@@ -27,3 +17,36 @@
   when:
     - ansible_version.full is version_compare('2.4', '>=')
     - ansible_selinux.status == "enabled"
+
+- block:
+    - name: Create textfile collector dir
+      file:
+        path: "{{ node_exporter_textfile_dir }}"
+        state: directory
+        owner: "{{ node_exporter_system_user }}"
+        group: "{{ node_exporter_system_group }}"
+        mode: 0775
+
+    - name: Download textfile collector scripts
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ _node_exporter_binary_install_dir }}/{{ item.src | basename }}"
+        owner: root
+        group: root
+        mode: "0755"
+      with_items: "{{ node_exporter_textfile_collectors }}"
+
+    - name: Setup textfile collector script cronjob
+      cron:
+        cron_file: "/etc/crontab"
+        name: "textfile collector {{ item.src | basename }}"
+        user: "{{ item.user | default('root') }}"
+        minute: "{{ item.minute | default(omit) }}"
+        hour: "{{ item.hour | default(omit) }}"
+        day: "{{ item.day | default(omit) }}"
+        month: "{{ item.month | default(omit) }}"
+        weekday: "{{ item.weekday | default(omit) }}"
+        special_time: "{{ item.special_time | default(omit) }}"
+        job: "{{ _node_exporter_binary_install_dir }}/{{ item.src | basename }} | sponge {{ node_exporter_textfile_dir }}/{{ item.src | basename }}.prom"
+      with_items: "{{ node_exporter_textfile_collectors }}"
+  when: node_exporter_textfile_dir | length > 0
