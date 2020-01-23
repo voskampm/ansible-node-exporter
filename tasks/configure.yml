@@ -27,6 +27,12 @@
         group: "{{ node_exporter_system_group }}"
         mode: 0775
 
+    - name: Install moreutils package
+      package:
+        name: moreutils
+        state: present
+      when: node_exporter_textfile_collectors | length > 0
+
     - name: Download textfile collector scripts
       copy:
         src: "{{ item.src }}"
