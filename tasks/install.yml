@@ -17,6 +17,16 @@
     home: /
   when: _node_exporter_system_user != "root"
 
+# To prevent the error below we have to install libselinux-python.
+#   fatal: [centos6]: FAILED! => {"changed": false, "msg": "Aborting, target uses selinux but python bindings (libselinux-python) aren't installed!"}
+- name: install libselinux-python
+  package:
+     name: libselinux-python
+     state: present
+  when: 
+     - ansible_service_mgr != 'systemd'
+     - ansible_facts['os_family'] == 'RedHat'
+
 - block:
     - name: Download node_exporter binary to local folder
       become: false
