@@ -9,7 +9,7 @@
   notify: restart node_exporter
   when: ansible_service_mgr == 'systemd'
 
-- name: "Ensure Node Exporter log file ({{ _node_exporter_log_file }}) exists and has the correct permissions" 
+- name: "Ensure Node Exporter log file ({{ _node_exporter_log_file }}) exists and has the correct permissions"
   file:
     path: "{{ _node_exporter_log_file }}"
     state: touch
@@ -29,14 +29,14 @@
   notify: restart node_exporter
   when: ansible_service_mgr == 'upstart'
   
-- name: Create textfile collector dir
+- name: "Create textfile collector dir ({{ node_exporter_textfile_dir }})"
   file:
     path: "{{ node_exporter_textfile_dir }}"
     state: directory
-    owner: "{{ _node_exporter_system_user }}"
-    group: "{{ _node_exporter_system_group }}"
+    owner: "{{ node_exporter_textfile_dir_user }}"
+    group: "{{ node_exporter_textfile_dir_group }}"
     recurse: true
-    mode: 0775
+    mode: "{{ node_exporter_textfile_dir_access }}"
   when: node_exporter_textfile_dir | length > 0
 
 - name: Allow Node Exporter port in SELinux on RedHat OS family
