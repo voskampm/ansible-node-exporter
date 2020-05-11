@@ -10,7 +10,6 @@ node_exporter_textfile_dir_access: "0775"
 
 
 node_exporter_enabled_collectors:
-  - systemd
   - textfile:
       directory: "{{ node_exporter_textfile_dir }}"
 #  - filesystem:
